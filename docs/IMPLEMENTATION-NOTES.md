@@ -184,9 +184,16 @@ These are real and not worked around:
 ## 5. Publication status
 
 - **Published**: <https://github.com/llinok111/maskdata-ruleforge> — public, MIT,
-  default branch `master`, **82 commits** (80 upstream + 2 derivative), pushed over
-  SSH (`ssh.github.com:443`) because plain `github.com:443` git-over-HTTPS times
-  out from this network.
+  default branch `master`, the 80 upstream commits plus the derivative commits on
+  top (run `git log --oneline` for the exact count; it is deliberately not
+  hard-coded here because updating this document would change it). Pushed over SSH
+  (`ssh.github.com:443`) because plain `github.com:443` git-over-HTTPS times out
+  from this network.
+- **Caveat on the figures**: they are committed in the repository and their byte
+  sizes were verified through the API, but `raw.githubusercontent.com` is
+  unreachable from the build machine, so the rendered `<img>` was not fetched back
+  over HTTP. Display depends on the visitor's network reaching GitHub's image
+  proxy.
 - **Not** published to npm. The package is `private` and versioned
   `1.3.4-ruleforge.1`; the `maskdata` name on npm belongs to upstream.
 - No CI workflow added.
