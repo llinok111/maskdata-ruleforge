@@ -9,6 +9,10 @@
     "type": "git",
     "url": "https://github.com/Sumukha1496/maskdata"
   },
+  "homepage": "https://github.com/llinok111/maskdata-ruleforge#readme",
+  "bugs": {
+    "url": "https://github.com/llinok111/maskdata-ruleforge/issues"
+  },
   "scripts": {
     "test": "mocha tests/test*.js --timeout 5000 --exit",
     "test:rules": "mocha tests/testRules.js tests/testMigration.js --timeout 5000 --exit",
@@ -46,7 +50,6 @@
     "token"
   ],
   "author": "sumukha.hs<sumukha.hs369@gmail.com>",
-  "homepage": "https://www.npmjs.com/package/maskdata?activeTab=readme",
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.23"

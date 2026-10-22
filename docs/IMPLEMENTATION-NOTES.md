@@ -181,12 +181,15 @@ These are real and not worked around:
     `maskAll`; use `kind: "string"` with `maskAll: true` to replace every
     character. Documented in `docs/RULES.md` §2 and the README.
 
-## 5. Not done
+## 5. Publication status
 
-- Not published to npm (package is `private`, version is a pre-release tag).
-- Not pushed to any GitHub remote — no repository or visibility was specified, so
-  the deliverable is a ZIP.
-- No CI workflow added (would need a remote to run).
+- **Published**: <https://github.com/llinok111/maskdata-ruleforge> — public, MIT,
+  default branch `master`, **82 commits** (80 upstream + 2 derivative), pushed over
+  SSH (`ssh.github.com:443`) because plain `github.com:443` git-over-HTTPS times
+  out from this network.
+- **Not** published to npm. The package is `private` and versioned
+  `1.3.4-ruleforge.1`; the `maskdata` name on npm belongs to upstream.
+- No CI workflow added.
 - No benchmark suite.
 - No Node version matrix (single runtime: v22.22.2).
 
