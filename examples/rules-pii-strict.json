@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "onConflict": "error",
+  "defaults": {
+    "maskWith": "*"
+  },
+  "rules": [
+    {
+      "id": "pan",
+      "kind": "card",
+      "order": 10,
+      "fields": ["paymentMethods[*].pan", "*cardNumber"],
+      "options": {
+        "unmaskedStartDigits": 0,
+        "unmaskedEndDigits": 4
+      },
+      "description": "PCI-DSS: never expose more than the last four digits"
+    },
+    {
+      "id": "email",
+      "kind": "email",
+      "order": 20,
+      "fields": ["profile.contact.email", "*email"],
+      "options": {
+        "unmaskedStartCharactersBeforeAt": 1,
+        "unmaskedEndCharactersAfterAt": 0,
+        "maskAtTheRate": false
+      },
+      "description": "Keep the first character and the domain"
+    },
+    {
+      "id": "phone",
+      "kind": "phone",
+      "order": 30,
+      "fields": ["profile.contact.mobile", "*phone"],
+      "options": {
+        "unmaskedStartDigits": 0,
+        "unmaskedEndDigits": 2
+      },
+      "description": "Keep only the last two digits"
+    },
+    {
+      "id": "national-id",
+      "kind": "generic",
+      "order": 40,
+      "fields": ["identity.passportNo", "identity.nationalId"],
+      "options": {
+        "maxMaskedCharacters": 4,
+        "unmaskedStartCharacters": 0,
+        "unmaskedEndCharacters": 0
+      },
+      "description": "Fixed-width output so length does not leak"
+    },
+    {
+      "id": "credentials",
+      "kind": "password",
+      "order": 50,
+      "fields": ["*password", "*secret", "*apiKey"],
+      "options": {
+        "maxMaskedCharacters": 8
+      },
+      "description": "Cap the masked output so password length is not revealed"
+    },
+    {
+      "id": "bearer-token",
+      "kind": "jwt",
+      "order": 60,
+      "fields": ["*token"],
+      "options": {
+        "maxMaskedCharacters": 24,
+        "maskDot": true
+      },
+      "description": "Mask all three JWT segments, including the separators"
+    }
+  ]
+}

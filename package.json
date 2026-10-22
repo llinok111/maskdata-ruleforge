@@ -1,7 +1,8 @@
 {
   "name": "maskdata",
-  "version": "1.3.4",
-  "description": "Node module to mask various kinds of data in the required formats",
+  "version": "1.3.4-ruleforge.1",
+  "private": true,
+  "description": "Node module to mask various kinds of data in the required formats. Fork adding a declarative, validated, ordered rule layer (maskJSON3) on top of the unmodified maskJSON2 API.",
   "main": "index.js",
   "typings": "index.d.ts",
   "repository": {
@@ -10,8 +11,11 @@
   },
   "scripts": {
     "test": "mocha tests/test*.js --timeout 5000 --exit",
+    "test:rules": "mocha tests/testRules.js tests/testMigration.js --timeout 5000 --exit",
+    "examples": "node examples/run-examples.js",
     "coverage": "nyc --reporter=html --reporter=text npm run test",
-    "format": "prettier --write '**/*.{ts,js,json}'"
+    "format": "prettier --write '**/*.{ts,js,json}'",
+    "typecheck": "tsc -p types-check/tsconfig.json"
   },
   "keywords": [
     "mask",

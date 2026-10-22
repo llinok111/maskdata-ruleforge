@@ -1,6 +1,18 @@
 maskdata is a Node.js module to mask various kinds of data. With the help of maskdata, you can mask email, phone number, card number, JSON fields, password, etc... 
 <br/>Also, it provides utility methods to get a field, or replace a field from any complex/nested JSON.
 
+> ### Fork notice: declarative rule layer
+> This is a derivative of [Sumukha1496/maskdata](https://github.com/Sumukha1496/maskdata) (MIT).
+> It adds a **declarative, validated, ordered** rule layer on top of the unchanged
+> `maskJSON2` API. Nothing existing was changed: the upstream test suite passes
+> unmodified.
+>
+> - [`maskJSON3`](#declarative-rules-maskjson3) — mask a document from a rule set with explicit execution order
+> - [`compileRules`](#declarative-rules-maskjson3) — validate a rule set once, with JSON-Pointer error locations
+> - [`migrateLegacyConfig`](#declarative-rules-maskjson3) — convert a `maskJSON2` config
+>
+> Full references: [`docs/RULES.md`](./docs/RULES.md) · [`docs/MIGRATION.md`](./docs/MIGRATION.md) · attribution in [`NOTICE`](./NOTICE).
+
 # Table of Contents
 - [Install maskdata](#install-maskdata)
 - [Version 1.3.4 Features](#release-features)
@@ -18,6 +30,7 @@ maskdata is a Node.js module to mask various kinds of data. With the help of mas
     - [JSON mask examples with nested fields](#json-mask-examples)
     - [Mask multiple fields at once using .* and [*].](#mask-multiple-fields)
     - [Recursive masking / Mask all the fields with a name in the json](#recursive-masking)
+  - [Declarative rules (maskJSON3)](#declarative-rules-maskjson3)
   - [Get Nested JSON Property](#get-nested-json-property)
   - [Replace the value of a JSON field](#replace-the-value-of-a-json-field)
 - [Report Bugs](#report-bugs)
@@ -1079,6 +1092,101 @@ const maskedOutput = maskData.maskJSON2(jsonInput, jsonMaskConfig);
   ]
 }
 ```
+
+## Declarative rules (maskJSON3)
+
+`maskJSON2` decides *what* to mask from a flat config whose kind set, execution
+order and error handling are hard-coded. `maskJSON3` takes the same mask services
+and drives them from an explicit rule set.
+
+```javascript
+const MaskData = require('maskdata');
+
+const ruleSet = {
+  version: 1,
+  defaults: { maskWith: '#' },
+  rules: [
+    { id: 'card', kind: 'card', order: 10, fields: ['cards[*].number'],
+      options: { unmaskedStartDigits: 0, unmaskedEndDigits: 4 } },
+    { id: 'phone', kind: 'phone', order: 20, fields: ['*phone'],
+      options: { unmaskedStartDigits: 3, unmaskedEndDigits: 2 } },
+  ],
+};
+
+const plan = MaskData.compileRules(ruleSet);   // validate once
+const masked = MaskData.maskJSON3(doc, plan);  // execute many times
+```
+
+What the layer guarantees:
+
+| Guarantee | How it is enforced |
+|---|---|
+| Rule validation | Unknown keys, kinds, options, malformed patterns and out-of-range values are rejected. Validation reports **all** issues at once. |
+| Error location | Every failure is a real `Error` with `code`, `ruleIndex`, `ruleId` and an RFC 6901 `pointer` such as `/rules/1/fields/0`. Upstream `BadOption` threw a bare string. |
+| Defaults | Three explicit layers: kind defaults → `ruleSet.defaults` → `rule.options`. Resolved values are readable on the compiled plan. |
+| Predictable order | Rules run by ascending `order`, ties broken by declaration index. `plan.explain()` prints exactly what will run, and `trace.rules` proves it after the fact. |
+| Conflict detection | Two rules hitting the same field at the same `order` raises `RULE_ORDER_CONFLICT` unless `onConflict` is `"warn"` or `"allow"`. |
+| No script execution | A rule set is data: eight closed kinds, JSON-scalar options. Functions, `RegExp`, `Symbol` and `__proto__`/`constructor`/`prototype` keys are rejected at compile time. |
+
+### Rules that upstream silently dropped now fail loudly
+
+`maskJSON2` `return`s without warning for `a.*.b`, `*a.b`, `a[*]`, `a..b` and for
+unknown keys such as `ipFields`. A mask rule that never fires is the dangerous
+case in a redaction pipeline, so all of them are compile errors here:
+
+```text
+MaskRuleError: Rule set validation failed (2 issues)
+  - [RULE_FIELD_PATTERN] /rules/1/fields/0: invalid field pattern "a.*.b": '.*' must be the final segment of a pattern
+  - [RULE_UNKNOWN_KEY] /rules/2/ipFields: unknown rule key "ipFields"
+```
+
+### Inspecting what will happen
+
+```javascript
+const { result, plan, trace, explain } = MaskData.maskJSON3(doc, ruleSet, { report: true });
+
+explain;   // [{ position: 0, id: 'card', kind: 'card', order: 10, fields: [...], options: {...} }, ...]
+trace;     // { onConflict, warnings, conflicts, rules: [{ id, matchedCount, changedCount, matched }] }
+```
+
+`trace.matched` contains field paths only — never values — so it is safe to log.
+It is capped by `maxTraceEntries` (default `1000`).
+
+### Migrating an existing config
+
+```javascript
+const { ruleSet, notes, droppedKeys } = MaskData.migrateLegacyConfig(legacyConfig);
+```
+
+Upstream's implicit numeric clamping (`maxMaskedCharacters: -5` → `16`, empty
+`maskWith` → `"*"`, `uuid` indices above 32, …) is materialised into explicit
+values so the migrated rule set compiles under the stricter validator **and keeps
+producing byte-identical output**. Unrecognised legacy keys are reported in
+`droppedKeys` instead of vanishing.
+
+See [`docs/MIGRATION.md`](./docs/MIGRATION.md) for the full mapping table, the
+behavioural differences, and a migration checklist.
+
+### Runnable examples
+
+```bash
+node examples/run-examples.js
+```
+
+`examples/rules-basic.json`, `examples/rules-pii-strict.json` and
+`examples/rules-nested-api.json` cover explicit ordering, a PCI-DSS-style PII
+posture, and array/recursive patterns. The script also prints a structured
+validation error and a legacy migration, so you can see the outputs without
+writing code.
+
+> Note: `kind: "generic"` has **no** `maskAll`/`values` options. To replace every
+> character of a value, use `kind: "string"` with `maskAll: true`. This mirrors the
+> upstream split between `maskString` and `maskStringV2`.
+
+Full option tables, pattern grammar and the complete error-code list:
+[`docs/RULES.md`](./docs/RULES.md).
+
+<br/>
 
 ## Get Nested JSON Property
 This method returns the value of the nested JSON property if it exists. Otherwise, it returns ```undefined```

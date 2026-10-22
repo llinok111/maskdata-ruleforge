@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "defaults": {
+    "maskWith": "#"
+  },
+  "rules": [
+    {
+      "id": "card",
+      "kind": "card",
+      "order": 10,
+      "fields": ["payment.cardNumber"],
+      "options": {
+        "unmaskedStartDigits": 0,
+        "unmaskedEndDigits": 4
+      },
+      "description": "Leave only the last four digits visible"
+    },
+    {
+      "id": "email",
+      "kind": "email",
+      "order": 20,
+      "fields": ["customer.email"],
+      "options": {
+        "unmaskedStartCharactersBeforeAt": 1,
+        "unmaskedEndCharactersAfterAt": 0,
+        "maskAtTheRate": true
+      },
+      "description": "Keep one character of the local part, mask the domain"
+    },
+    {
+      "id": "phone",
+      "kind": "phone",
+      "order": 30,
+      "fields": ["customer.phone"],
+      "options": {
+        "unmaskedStartDigits": 3,
+        "unmaskedEndDigits": 2
+      },
+      "description": "Keep the country prefix and the last two digits"
+    }
+  ]
+}

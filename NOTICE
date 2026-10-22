@@ -1,0 +1,52 @@
+maskdata-ruleforge
+==================
+
+This distribution is a derivative work of the `maskdata` project.
+
+Upstream
+--------
+  Project : maskdata
+  Author  : SUMUKHA H S
+  Source  : https://github.com/Sumukha1496/maskdata
+  Version : 1.3.4 (commit ccfab5b)
+  License : MIT
+
+  The upstream LICENSE file is included verbatim at the root of this
+  distribution and has not been modified. The upstream git history is preserved
+  in this repository; the derivative work is contained in additional commits on
+  top of commit ccfab5b.
+
+Modifications
+-------------
+  Added, without altering any pre-existing upstream file except index.js
+  (additive static methods only) and index.d.ts (additive type declarations):
+
+    lib/rules/MaskRuleError.js     structured error type with JSON Pointer locations
+    lib/rules/RuleSchema.js        declarative schema: kinds, option specs, defaults
+    lib/rules/FieldPattern.js      field pattern parser and target collector
+    lib/rules/RuleCompiler.js      validation, default resolution, ordering, conflicts
+    lib/rules/RuleEngine.js        plan execution, trace, runtime conflict detection
+    lib/rules/LegacyMigration.js   maskJSON2 config -> declarative rule set
+    tests/testRules.js             rule layer test suite
+    tests/testMigration.js         migration equivalence test suite
+    examples/                      rule set samples and a runnable demo
+    docs/RULES.md                  rule reference
+    docs/MIGRATION.md              migration guide
+
+  The pre-existing mask services under lib/maskService/ and the helper module
+  lib/helpers/ are unchanged. `maskJSON2` behaviour is unchanged; the upstream
+  test suite passes unmodified.
+
+Copyright
+---------
+  Upstream portions : Copyright (c) 2019 SUMUKHA H S — MIT (see LICENSE)
+  New portions      : Copyright (c) 2026 maskdata-ruleforge contributors — MIT
+
+  Both are distributed under the MIT terms reproduced in LICENSE.
+
+Third-party runtime dependencies
+--------------------------------
+  lodash (MIT) — used by the unchanged upstream helpers.
+
+No API keys, credentials, personal data or customer data are included in this
+distribution.

@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "defaults": {
+    "maskWith": "#"
+  },
+  "rules": [
+    {
+      "id": "list-phone",
+      "kind": "phone",
+      "order": 10,
+      "fields": ["users[*].phone"],
+      "options": {
+        "unmaskedStartDigits": 3,
+        "unmaskedEndDigits": 0
+      },
+      "description": "Array index wildcard: every element of users"
+    },
+    {
+      "id": "tag-values",
+      "kind": "string",
+      "order": 20,
+      "fields": ["meta.tags.*"],
+      "options": {
+        "maskAll": true,
+        "maskSpace": false
+      },
+      "description": "Single-level leaf wildcard: every value under meta.tags"
+    },
+    {
+      "id": "any-email",
+      "kind": "email",
+      "order": 30,
+      "fields": ["*email"],
+      "options": {
+        "unmaskedStartCharactersBeforeAt": 0,
+        "unmaskedEndCharactersAfterAt": 0
+      },
+      "description": "Recursive name match: any key literally named email, at any depth"
+    }
+  ]
+}
