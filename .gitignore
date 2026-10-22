@@ -5,3 +5,6 @@ coverage/
 .idea/
 /*.iml
 .DS_Store
+
+# figure build scratch (headless browser profile + intermediate html)
+docs/img/_build/.tmp/

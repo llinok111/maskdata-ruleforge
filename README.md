@@ -13,6 +13,8 @@ maskdata is a Node.js module to mask various kinds of data. With the help of mas
 >
 > Full references: [`docs/RULES.md`](./docs/RULES.md) · [`docs/MIGRATION.md`](./docs/MIGRATION.md) · attribution in [`NOTICE`](./NOTICE).
 
+![maskJSON2 versus maskJSON3: same mask services, explicit rule compilation instead of a hard-coded dispatch table](docs/img/architecture.png)
+
 # Table of Contents
 - [Install maskdata](#install-maskdata)
 - [Version 1.3.4 Features](#release-features)
@@ -1117,6 +1119,8 @@ const plan = MaskData.compileRules(ruleSet);   // validate once
 const masked = MaskData.maskJSON3(doc, plan);  // execute many times
 ```
 
+![One real pass: input document, resolved execution order from plan.explain(), masked output, and the trace counters](docs/img/run-through.png)
+
 What the layer guarantees:
 
 | Guarantee | How it is enforced |
@@ -1139,6 +1143,8 @@ MaskRuleError: Rule set validation failed (2 issues)
   - [RULE_FIELD_PATTERN] /rules/1/fields/0: invalid field pattern "a.*.b": '.*' must be the final segment of a pattern
   - [RULE_UNKNOWN_KEY] /rules/2/ipFields: unknown rule key "ipFields"
 ```
+
+![Structured MaskRuleError: code, JSON Pointer, rule id and index, with all issues reported in one throw](docs/img/error-location.png)
 
 ### Inspecting what will happen
 

@@ -189,3 +189,38 @@ These are real and not worked around:
 - No CI workflow added (would need a remote to run).
 - No benchmark suite.
 - No Node version matrix (single runtime: v22.22.2).
+
+---
+
+## 6. Figures
+
+The three README figures are **generated from live output**, not drawn by hand:
+
+```bash
+node docs/img/_build/build-images.cjs
+```
+
+The script calls `maskJSON3` for real, then bakes the resulting masked strings,
+`plan.explain()` rows, trace counters and the actual `MaskRuleError` text into the
+HTML templates before rendering with headless Microsoft Edge at 2× device scale.
+Consequence: if the code output changes, the figures change with it — they cannot
+drift silently.
+
+| File | Content | Source of the numbers |
+|---|---|---|
+| `docs/img/architecture.png` | `maskJSON2` vs `maskJSON3` pipeline, and the three silent failure points | static structure of `JsonMask.js` + `lib/rules/` |
+| `docs/img/run-through.png` | input document → resolved order → masked output → trace | live run against `examples/rules-basic.json` |
+| `docs/img/error-location.png` | a real aggregated `MaskRuleError` and an upstream `throw` comparison | live `compileRules` failure + live `maskPhone` throw |
+
+Verification performed on the rendered PNGs:
+
+- **Geometry probe** (automated, part of the build): a synchronous script walks
+  every element and reports any node escaping the canvas or clipped by an
+  `overflow:hidden` container. All three figures report `LAYOUT_OK`.
+- **Pixel check**: 3040 px wide @2×; zero non-background pixels within 4 px of any
+  border; ink coverage 51–66 %; 5 300–7 400 distinct colours (i.e. real text
+  rendering, not a blank or flat-fill image).
+
+Not verified automatically: legibility and aesthetic judgement. Those still need
+a human looking at the image.
+
